@@ -4,12 +4,15 @@ import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import axios from 'axios';
+import './src/styles/index.css';
 
-import App from './layouts/App';
+import App from './src/layouts/App';
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL =
-  process.env.NODE_ENV === 'production' ? 'https://sleact.nodebird.com' : 'http://localhost:3090';
+  process.env.NODE_ENV === 'production'
+    ? 'https://sleact.nodebird.com'
+    : 'http://localhost:3090';
 
 render(
   <BrowserRouter>
