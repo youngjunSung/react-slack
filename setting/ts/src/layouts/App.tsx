@@ -1,6 +1,7 @@
 import React from 'react';
 import { Switch, Route, Redirect, Link } from 'react-router-dom';
-import { Title } from '@components/Title';
+import { TextField, Button } from '@components/index';
+import { LogoSlack } from '@assets/icons/';
 import loadable from '@loadable/component';
 
 // 코드 스플리팅
@@ -12,23 +13,15 @@ const App = () => {
     a: 123,
   };
   return (
-    <div>
-      초기 세팅입니다
-      <Title
-        title="Title 컴포넌트의 타이틀"
-        className="bg-slate-500 text-[24px] pt-[20px]"
-      />
-      <Link className='mx-[10px]' to="/">/</Link>
-      <Link className='mx-[10px]' to="/login">로그인</Link>
-      <Link className='mx-[10px]' to="/sign">회원가입</Link>
+    <div className="max-w-[400px] mx-auto">
+      <div className="flex justify-center py-[20px]">
+        <LogoSlack />
+      </div>
       <Switch>
-        <Redirect exact path='/' to='/login'></Redirect>
-        <Route path='/login' component={Login}></Route>
-        <Route path='/sign' component={Sign}></Route>
+        <Redirect exact path="/" to="/login"></Redirect>
+        <Route path="/login" component={Login}></Route>
+        <Route path="/sign" component={Sign}></Route>
       </Switch>
-      {/* <Redirect exact path="/" to="/"></Redirect>
-      <Route path="/login" component={Login}></Route>
-      <Route path="/sign" component={Sign}></Route> */}
     </div>
   );
 };

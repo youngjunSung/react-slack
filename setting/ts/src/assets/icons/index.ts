@@ -1,0 +1,1 @@
+export { LogoSlack } from './LogoSlack';
