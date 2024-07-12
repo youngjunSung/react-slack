@@ -10,9 +10,9 @@ const Sign = () => {
       <TextField label="비밀번호" type="password" />
       <TextField label="비밀번호 확인" type="password" />
       <Button text="회원가입" />
-      <p className="mt-[10px]">
+      <p className="mt-[10px] text-center">
         이미 계정이 있으신가요? 
-        <Link to="/login" className="text-blue-600">
+        <Link to="/login" className="ml-[4px] text-blue-600">
           로그인
         </Link>
       </p>
