@@ -1,50 +1,27 @@
 import React, { useState, useCallback } from 'react';
 import { TextField, Button } from '@components/index';
 import { Link } from 'react-router-dom';
+import { useInput } from '@hooks/useInput';
 
 const Sign = () => {
-  const [email, setEmail] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordCheck, setPasswordCheck] = useState('');
-  const [missmatchError, setMissmatchError] = useState(false);
-
-  const onChangeEmail = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setEmail(e.target.value);
-    },
-    [email],
-  );
-
-  const onChangeNickname = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setNickname(e.target.value);
-    },
-    [nickname],
-  );
-
-  console.log('렌더링 1')
+  const [email, setEmail, onChangeEmail] = useInput('');
+  const [nickname, setNickname, onChangeNickname] = useInput<string>('');
+  const [password, setPassword] = useInput<string>('');
+  const [passwordCheck, setPasswordCheck] = useInput<string>('');
+  const [missmatchError, setMissmatchError] = useInput(false);
+  
   const onChangePassword = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(e.target.value);
       setMissmatchError(e.target.value !== passwordCheck);
-      console.log('password e.target.value : ' + e.target.value)
-      console.log('password : ' + password)
-      console.log('passwordCheck : ' + passwordCheck)
-      // password === passwordCheck ? setMissmatchError(false) : setMissmatchError(true);
     },
     [password, passwordCheck],
   );
-  console.log('렌더링 2')
 
   const onChangePasswordCheck = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPasswordCheck(e.target.value);
       setMissmatchError(e.target.value !== password);
-      console.log('passwordCheck e.target.value : ' + e.target.value)
-      console.log('password : ' + password)
-      console.log('passwordCheck : ' + passwordCheck)
-      // password === passwordCheck ? setMissmatchError(false) : setMissmatchError(true);
     },
     [password, passwordCheck],
   );
