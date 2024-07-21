@@ -10,7 +10,7 @@ interface TextFieldProps {
 }
 
 export const TextField: React.FC<TextFieldProps> = memo(({ id, label, type = 'text', className, onChange, value }) => {
-  console.log(`${label} 렌더링!`);
+  // console.log(`${label} 렌더링!`);
   return (
     <div className={`flex flex-col my-[20px] ${className}`}>
       <label htmlFor={id} className="mb-[4px]">
