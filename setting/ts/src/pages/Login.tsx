@@ -17,8 +17,6 @@ const Login = () => {
   const [email, setEmail, onChangeEmail] = useInput('');
   const [password, setPassword] = useInput<string>('');
 
-  console.log(data);
-
   const onChangePassword = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(e.target.value);
@@ -37,8 +35,7 @@ const Login = () => {
             withCredentials: true,
           },
         )
-        .then((res) => {
-          console.log(res);
+        .then(() => {
           mutate();
         })
         .catch((error) => {
@@ -47,6 +44,8 @@ const Login = () => {
     },
     [email, password],
   );
+
+  console.log(data);
 
   if (data) return <Navigate to="/workspace/channel" />;
 

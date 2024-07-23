@@ -10,22 +10,20 @@ interface WorkSpaceProps {
 
 const WorkSpace = ({ children }: WorkSpaceProps) => {
   const { data, error, mutate } = useSWR('http://localhost:3095/api/users', fetcher);
-  console.log(data);
   const onSubmit = useCallback(
     (e) => {
       axios
         .post('http://localhost:3095/api/users/logout', null, {
           withCredentials: true,
         })
-        .then((res) => {
-          console.log(res);
+        .then(() => {
           mutate();
         });
     },
     [data],
   );
 
-  if (data === undefined) return <Navigate to="/" />;
+  if (!data) return <Navigate to="/" />;
 
   return (
     <div className="flex flex-col bg-[#461448] h-full">

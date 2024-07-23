@@ -1,11 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { TextField, Button } from '@components/index';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useInput } from '@hooks/useInput';
 import { LogoSlack } from '@assets/icons/';
 import axios from 'axios';
+import useSWR from 'swr';
+import fetcher from '@utils/fetcher';
 
 const Sign = () => {
+  const { data, error, mutate } = useSWR('http://localhost:3095/api/users', fetcher);
   const [email, setEmail, onChangeEmail] = useInput('');
   const [nickname, setNickname, onChangeNickname] = useInput<string>('');
   const [password, setPassword] = useInput<string>('');
@@ -43,8 +46,7 @@ const Sign = () => {
             nickname,
             password,
           })
-          .then((res) => {
-            console.log(res);
+          .then(() => {
             setSignUpSuccess(true);
           })
           .catch((error) => {
@@ -56,6 +58,8 @@ const Sign = () => {
     },
     [email, nickname, password, passwordCheck, missmatchError],
   );
+
+  if (!data) return <Navigate to="/" />;
 
   return (
     <div className="max-w-[400px] mx-auto px-[20px]">
