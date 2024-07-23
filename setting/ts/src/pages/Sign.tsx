@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { TextField, Button } from '@components/index';
 import { Link } from 'react-router-dom';
 import { useInput } from '@hooks/useInput';
+import { LogoSlack } from '@assets/icons/';
 import axios from 'axios';
 
 const Sign = () => {
@@ -57,7 +58,11 @@ const Sign = () => {
   );
 
   return (
-    <>
+    <div className="max-w-[400px] mx-auto px-[20px]">
+      <h1 className="flex justify-center pt-[60px] pb-[20px]">
+        <LogoSlack />
+        <span className="blind">Slack</span>
+      </h1>
       <TextField label="이메일 주소" type="email" value={email} onChange={onChangeEmail} />
       <TextField label="닉네임" value={nickname} onChange={onChangeNickname} />
       <TextField label="비밀번호" type="password" value={password} onChange={onChangePassword} />
@@ -72,7 +77,7 @@ const Sign = () => {
           로그인
         </Link>
       </p>
-    </>
+    </div>
   );
 };
 

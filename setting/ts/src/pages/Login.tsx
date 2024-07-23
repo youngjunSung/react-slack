@@ -1,7 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { TextField, Button } from '@components/index';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useInput } from '@hooks/useInput';
+import { LogoSlack } from '@assets/icons/';
 import axios from 'axios';
 import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
@@ -16,13 +17,13 @@ const Login = () => {
   const [email, setEmail, onChangeEmail] = useInput('');
   const [password, setPassword] = useInput<string>('');
 
-  // console.log(data);
+  console.log(data);
 
   const onChangePassword = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(e.target.value);
     },
-    [email, password],
+    [email, password, data],
   );
 
   const onSubmit = useCallback(
@@ -47,8 +48,14 @@ const Login = () => {
     [email, password],
   );
 
+  if (data) return <Navigate to="/workspace/channel" />;
+
   return (
-    <>
+    <div className="max-w-[400px] mx-auto px-[20px]">
+      <h1 className="flex justify-center pt-[60px] pb-[20px]">
+        <LogoSlack />
+        <span className="blind">Slack</span>
+      </h1>
       <TextField label="이메일 주소" type="email" value={email} onChange={onChangeEmail} />
       <TextField label="비밀번호" type="password" value={password} onChange={onChangePassword} />
       {logInError && <p className="mb-[20px] mt-[-10px] text-red-500 font-normal">로그인 실패</p>}
@@ -59,7 +66,7 @@ const Login = () => {
           회원가입
         </Link>
       </p>
-    </>
+    </div>
   );
 };
 
