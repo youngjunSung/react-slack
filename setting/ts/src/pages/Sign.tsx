@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { TextField, Button } from '@components/index';
+import { TextField, Button } from '@components';
 import { Link, Navigate } from 'react-router-dom';
 import { useInput } from '@hooks/useInput';
 import { LogoSlack } from '@assets/icons/';
