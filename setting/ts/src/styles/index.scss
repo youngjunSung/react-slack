@@ -36,6 +36,20 @@
     font-family: 'pretendard', sans-serif;
     font-size: 14px;
   }
+  summary {
+    outline: 0 none;
+    &::-webkit-details-marker,
+    &::marker {
+      content: '';
+      display: none;
+    }
+    &:focus {
+      outline: 0 none;
+    }
+  }
+  [hidden] {
+    display: none !important;
+  }
 }
 
 @layer utilities {

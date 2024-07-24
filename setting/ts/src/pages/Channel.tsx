@@ -4,7 +4,7 @@ import WorkSpace from '../layouts/WorkSpace';
 const Channel = () => {
   return (
     <WorkSpace>
-      <p>채널 영역</p>
+      {/* <p>채널 영역</p> */}
     </WorkSpace>
   );
 };

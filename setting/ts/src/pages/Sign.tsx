@@ -59,7 +59,7 @@ const Sign = () => {
     [email, nickname, password, passwordCheck, missmatchError],
   );
 
-  if (!data) return <Navigate to="/" />;
+  if (data) return <Navigate to="/workspace/channel" />;
 
   return (
     <div className="max-w-[400px] mx-auto px-[20px]">
