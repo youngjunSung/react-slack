@@ -13,13 +13,13 @@ export const TextField: React.FC<TextFieldProps> = memo(({ id, label, type = 'te
   // console.log(`${label} 렌더링!`);
   return (
     <div className={`flex flex-col my-[20px] ${className}`}>
-      <label htmlFor={id} className="mb-[4px]">
+      <label htmlFor={id} className="mb-[4px] text-primary text-[14px] font-[500]">
         {label}
       </label>
       <input
         type={type}
         id={id}
-        className="p-[10px] border-[1px] border-gray-300 border-solid rounded-[8px]"
+        className="py-[10px] border-b-[2px] border-primary border-solid rounded-none focus:outline-none"
         onChange={onChange}
         value={value}
       />

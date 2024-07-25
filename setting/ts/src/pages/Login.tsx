@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { TextField, Button } from '@components';
 import { Link, Navigate } from 'react-router-dom';
 import { useInput } from '@hooks/useInput';
-import { LogoSlack } from '@assets/icons/';
+import { LogoChat } from '@assets/icons/';
 import axios from 'axios';
 import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
@@ -51,8 +51,9 @@ const Login = () => {
 
   return (
     <div className="max-w-[400px] mx-auto px-[20px]">
-      <h1 className="flex justify-center pt-[60px] pb-[20px]">
-        <LogoSlack />
+      <h1 className="flex flex-col items-center justify-center pt-[60px] pb-[20px]">
+        <LogoChat color="#444791" />
+        <span className="mt-[10px] text-primary text-[20px] font-bold">ReChat</span>
         <span className="blind">Slack</span>
       </h1>
       <TextField label="이메일 주소" type="email" value={email} onChange={onChangeEmail} />
@@ -61,7 +62,7 @@ const Login = () => {
       <Button text="로그인" onClick={onSubmit} />
       <p className="mt-[10px] text-center">
         Slack을 처음 사용하시나요?
-        <Link to="/sign" className="ml-[4px] text-blue-600">
+        <Link to="/sign" className="ml-[4px] text-[#004174]">
           회원가입
         </Link>
       </p>
