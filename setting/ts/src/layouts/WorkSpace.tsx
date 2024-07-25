@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useEffect, ReactNode } from 'react';
-import { useLocation, Navigate } from 'react-router-dom';
+import { useLocation, Navigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
 import { Outlet } from 'react-router-dom';
 import * as Icon from '@assets/icons';
+import gravatar from 'gravatar';
 
 const WorkSpace = () => {
   const { data, error, mutate } = useSWR('http://localhost:3095/api/users', fetcher);
@@ -26,6 +27,7 @@ const WorkSpace = () => {
   return (
     <div className="flex flex-col h-full bg-primary">
       <header className="flex min-h-[40px] py-[6px] px-[10px]">
+        <img src={gravatar.url(data.email, { s: '28px', d: 'retro' })} alt="" />
         <button type="button" className="ml-auto text-white" onClick={onSubmit}>
           로그아웃
         </button>
@@ -68,12 +70,12 @@ const WorkSpace = () => {
                   Channels
                 </summary>
                 <div className="flex flex-col">
-                  <button type="button" className="py-[4px] text-[14px] text-white font-normal text-left">
+                  <Link to="channel" className="py-[4px] text-[14px] text-white font-normal text-left">
                     Ch1
-                  </button>
-                  <button type="button" className="py-[4px] text-[14px] text-white font-normal text-left">
+                  </Link>
+                  <Link to="channel" className="py-[4px] text-[14px] text-white font-normal text-left">
                     Ch2
-                  </button>
+                  </Link>
                 </div>
               </details>
               <details className="group" open>
@@ -89,9 +91,9 @@ const WorkSpace = () => {
                 <div className="flex flex-col">
                   {[...Array(100)].map((_, idx) => {
                     return (
-                      <button key={idx} type="button" className="py-[4px] text-[14px] text-white font-normal text-left">
+                      <Link key={idx} to="dm" className="py-[4px] text-[14px] text-white font-normal text-left">
                         id{idx}
-                      </button>
+                      </Link>
                     );
                   })}
                 </div>

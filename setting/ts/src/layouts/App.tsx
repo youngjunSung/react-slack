@@ -8,6 +8,7 @@ const Login = loadable(() => import('@pages/Login'));
 const Sign = loadable(() => import('@pages/Sign'));
 const WorkSpace = loadable(() => import('@layouts/WorkSpace'));
 const Channel = loadable(() => import('@pages/Channel'));
+const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
       <Route path="/sign" element={<Sign />} />
       <Route path="/workspace" element={<WorkSpace />}>
         <Route path="channel" element={<Channel />} />
+        <Route path="dm" element={<DirectMessage />} />
       </Route>
     </Routes>
   );
