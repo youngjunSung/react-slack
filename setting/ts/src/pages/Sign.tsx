@@ -34,7 +34,7 @@ const Sign = () => {
   );
 
   const onSubmit = useCallback(
-    (e) => {
+    (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!missmatchError && nickname) {
         console.log('회원가입 시도');
         setSignUpError('');

@@ -6,11 +6,20 @@ import fetcher from '@utils/fetcher';
 import { Outlet } from 'react-router-dom';
 import * as Icon from '@assets/icons';
 import gravatar from 'gravatar';
+import { Button, Menu, MenuItem, Popover } from '@mui/material';
 
 const WorkSpace = () => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const { data, error, mutate } = useSWR('http://localhost:3095/api/users', fetcher);
   const onSubmit = useCallback(
-    (e) => {
+    (e: React.MouseEvent<HTMLButtonElement>) => {
       axios
         .post('http://localhost:3095/api/users/logout', null, {
           withCredentials: true,
@@ -27,10 +36,9 @@ const WorkSpace = () => {
   return (
     <div className="flex flex-col h-full bg-primary">
       <header className="flex min-h-[40px] py-[6px] px-[10px]">
-        <img src={gravatar.url(data.email, { s: '28px', d: 'retro' })} alt="" />
-        <button type="button" className="ml-auto text-white" onClick={onSubmit}>
+        {/* <button type="button" className="ml-auto text-white" onClick={onSubmit}>
           로그아웃
-        </button>
+        </button> */}
       </header>
       <main className="flex flex-1 min-h-0">
         <div className="flex flex-col shrink-0 items-center py-[14px] px-[6px] w-[70px]">
@@ -52,6 +60,30 @@ const WorkSpace = () => {
           >
             <Icon.Plus width={20} height={20} color="#fff" />
           </button>
+          <button type="button" onClick={handleClick} className="flex items-center justify-center mt-auto rounded-[4px] overflow-hidden">
+            <img src={gravatar.url(data.email, { s: '36px', d: 'retro' })} alt="" />
+          </button>
+          <Popover
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: -10,
+            }}
+          >
+            <MenuItem onClick={handleClose}>Profile</MenuItem>
+            <MenuItem onClick={handleClose}>My account</MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+          </Popover>
         </div>
         <article className="flex flex-1 mb-[5px] mr-[5px] rounded-[8px] overflow-hidden">
           <div className="flex flex-col bg-[#f9edff1c] w-[320px]">

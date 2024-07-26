@@ -25,7 +25,7 @@ const Login = () => {
   );
 
   const onSubmit = useCallback(
-    (e) => {
+    (e: React.MouseEvent<HTMLButtonElement>) => {
       setLogInError(false);
       axios
         .post(
