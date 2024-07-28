@@ -6,68 +6,176 @@ import fetcher from '@utils/fetcher';
 import { Outlet } from 'react-router-dom';
 import * as Icon from '@assets/icons';
 import gravatar from 'gravatar';
-import { Button, Menu, MenuItem, Popover } from '@mui/material';
+import { Menu, MenuItem, Popover, Divider, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { TextField, Button } from '@components';
+import { useInput } from '@hooks/useInput';
+import { IUser } from '@typings/db';
+import { KeyboardArrowDown } from '@mui/icons-material';
 
 const WorkSpace = () => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-  const { data, error, mutate } = useSWR('http://localhost:3095/api/users', fetcher);
-  const onSubmit = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      axios
-        .post('http://localhost:3095/api/users/logout', null, {
-          withCredentials: true,
-        })
-        .then(() => {
-          mutate();
-        });
-    },
-    [data],
-  );
+  const { data: myLoginData, error, mutate } = useSWR<IUser | false>('http://localhost:3095/api/users', fetcher);
+  const [channelName, setChannelName, onChangeChannelName] = useInput('');
+  const [wsName, setWsName, onChangeWsName] = useInput('');
+  const [wsUrl, setWsUrl, onChangeWsUrl] = useInput('');
 
-  if (!data) return <Navigate to="/" />;
+  const [anchorElProfile, setAnchorElProfile] = useState<null | HTMLElement>(null);
+  const openMenuProfile = Boolean(anchorElProfile);
+
+  const handleMemuProfileClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElProfile(event.currentTarget);
+  };
+
+  const handleMenuProfileClose = () => {
+    setAnchorElProfile(null);
+  };
+
+  const [anchorElWorkspace, setAnchorElWorkspace] = useState<null | HTMLElement>(null);
+  const openMenuWorkspace = Boolean(anchorElWorkspace);
+
+  const handleMemuWorkspaceClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElWorkspace(event.currentTarget);
+  };
+
+  const handleMenuWorkspaceClose = () => {
+    setAnchorElWorkspace(null);
+  };
+
+  const [openDialogNewWorkspace, setOpenDialogNewWorkspace] = useState(false);
+
+  const handleDialogNewWorkspaceOpen = () => {
+    setOpenDialogNewWorkspace(true);
+  };
+
+  const handleDialogNewWorkspaceClose = () => {
+    setOpenDialogNewWorkspace(false);
+  };
+
+  const [openDialogNewChannel, setOpenDialogNewChannel] = useState(false);
+
+  const handleDialogNewChannelOpen = () => {
+    setOpenDialogNewChannel(true);
+  };
+
+  const handleDialogNewChannelClose = () => {
+    setOpenDialogNewChannel(false);
+  };
+
+  const handleCreateWorkspace = useCallback(() => {
+    if (!wsName || !wsName.trim()) return;
+    if (!wsUrl || !wsUrl.trim()) return;
+    axios
+      .post(
+        'http://localhost:3095/api/workspaces',
+        { workspace: wsName, url: wsUrl },
+        {
+          withCredentials: true,
+        },
+      )
+      .then(() => {
+        mutate();
+        handleDialogNewWorkspaceClose();
+        setWsName('');
+        setWsUrl('');
+        handleDialogNewChannelClose();
+        setChannelName('');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [wsName, wsUrl]);
+
+  const handleCreateChannel = useCallback(() => {
+    if (!channelName || !channelName.trim()) return;
+    axios
+      .post(
+        'http://localhost:3095/api/workspaces',
+        { name: channelName },
+        {
+          withCredentials: true,
+        },
+      )
+      .then(() => {
+        mutate();
+        handleDialogNewChannelClose();
+        setChannelName('');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [channelName]);
+
+  const handleLogout = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    axios
+      .post('http://localhost:3095/api/users/logout', null, {
+        withCredentials: true,
+      })
+      .then(() => {
+        mutate();
+      });
+  }, []);
+
+  if (!myLoginData) return <Navigate to="/" />;
 
   return (
     <div className="flex flex-col h-full bg-primary">
-      <header className="flex min-h-[40px] py-[6px] px-[10px]">
-        {/* <button type="button" className="ml-auto text-white" onClick={onSubmit}>
-          로그아웃
-        </button> */}
-      </header>
+      <header className="flex min-h-[40px] py-[6px] px-[10px]"></header>
       <main className="flex flex-1 min-h-0">
         <div className="flex flex-col shrink-0 items-center py-[14px] px-[6px] w-[70px]">
+          {myLoginData.Workspaces.map((ws) => {
+            return (
+              <Link
+                key={ws.id}
+                to={`${123}/channel/일반`}
+                type="button"
+                className="flex justify-center items-center rounded-[6px] bg-[#ababad] text-black text-[20px] font-bold w-[36px] h-[36px] [&:not(:last-child)]:mb-[20px]"
+              >
+                {ws.name.slice(0, 1)}
+              </Link>
+            );
+          })}
           <button
             type="button"
-            className="flex justify-center items-center rounded-[6px] bg-[#ababad] text-black text-[20px] font-bold w-[36px] h-[36px] [&:not(:last-child)]:mb-[20px]"
-          >
-            R
-          </button>
-          <button
-            type="button"
-            className="flex justify-center items-center rounded-[6px] bg-[#ababad] text-black text-[20px] font-bold w-[36px] h-[36px] [&:not(:last-child)]:mb-[20px]"
-          >
-            S
-          </button>
-          <button
-            type="button"
+            onClick={handleDialogNewWorkspaceOpen}
             className="flex justify-center items-center rounded-[6px] text-black text-[20px] font-bold w-[36px] h-[36px] [&:not(:last-child)]:mb-[20px]"
           >
             <Icon.Plus width={20} height={20} color="#fff" />
           </button>
-          <button type="button" onClick={handleClick} className="flex items-center justify-center mt-auto rounded-[4px] overflow-hidden">
-            <img src={gravatar.url(data.email, { s: '36px', d: 'retro' })} alt="" />
+          <Dialog
+            open={openDialogNewWorkspace}
+            onClose={handleDialogNewWorkspaceClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+            sx={{
+              '& .MuiPaper-root': {
+                width: 350,
+              },
+              '& .MuiDialogActions-root': {
+                padding: '16px 24px',
+              },
+            }}
+          >
+            <DialogTitle id="alert-dialog-title">
+              <span className="text-[18px] text-primary font-bold">워크스페이스 생성</span>
+            </DialogTitle>
+            <DialogContent>
+              <TextField label="워크스페이스 이름" type="email" value={wsName} onChange={onChangeWsName} />
+              <TextField label="워크스페이스 URL" value={wsUrl} onChange={onChangeWsUrl} />
+            </DialogContent>
+            <DialogActions>
+              <Button text="생성하기" onClick={handleCreateWorkspace} />
+            </DialogActions>
+          </Dialog>
+          <button
+            type="button"
+            onClick={handleMemuProfileClick}
+            className="flex items-center justify-center mt-auto rounded-[4px] overflow-hidden"
+          >
+            <img src={gravatar.url(myLoginData.email, { s: '36px', d: 'retro' })} alt="" />
           </button>
-          <Popover
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
+          <Menu
+            anchorEl={anchorElProfile}
+            open={openMenuProfile}
+            onClose={handleMenuProfileClose}
             anchorOrigin={{
               vertical: 'bottom',
               horizontal: 'right',
@@ -76,19 +184,85 @@ const WorkSpace = () => {
               vertical: 'bottom',
               horizontal: -10,
             }}
+            sx={{
+              '& .MuiPaper-root': {
+                width: 300,
+              },
+            }}
           >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={handleClose}>My account</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
-          </Popover>
+            <MenuItem>
+              <img src={gravatar.url(myLoginData.email, { s: '36px', d: 'retro' })} alt="" className="rounded-[4px]" />
+              <div className="pl-[10px]">
+                <p>{myLoginData.nickname}</p>
+                <p>Active</p>
+              </div>
+            </MenuItem>
+            <Divider />
+            <MenuItem>Profile</MenuItem>
+            <MenuItem>Setting</MenuItem>
+            <Divider />
+            <MenuItem onClick={handleLogout}>
+              <p>Logout</p>
+            </MenuItem>
+          </Menu>
         </div>
         <article className="flex flex-1 mb-[5px] mr-[5px] rounded-[8px] overflow-hidden">
           <div className="flex flex-col bg-[#f9edff1c] w-[320px]">
             <div className="py-[16px] px-[20px]">
-              <h2 className="text-[18px] font-bold text-white">Work Space</h2>
+              <button type="button" onClick={handleMemuWorkspaceClick} className="text-[18px] font-bold text-white">
+                Work Space <KeyboardArrowDown />
+              </button>
+              <Menu
+                anchorEl={anchorElWorkspace}
+                open={openMenuWorkspace}
+                onClose={handleMenuWorkspaceClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+                transformOrigin={{
+                  vertical: -10,
+                  horizontal: 'left',
+                }}
+                sx={{
+                  '& .MuiPaper-root': {
+                    width: 280,
+                  },
+                }}
+              >
+                <MenuItem>Sleact</MenuItem>
+                <MenuItem>~ 으로 사용자 초대</MenuItem>
+                <MenuItem onClick={handleDialogNewChannelOpen}>채널 만들기</MenuItem>
+              </Menu>
+              <Dialog
+                open={openDialogNewChannel}
+                onClose={handleDialogNewChannelClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                sx={{
+                  '& .MuiPaper-root': {
+                    width: 350,
+                  },
+                  '& .MuiDialogActions-root': {
+                    padding: '16px 24px',
+                  },
+                }}
+              >
+                <DialogTitle id="alert-dialog-title">
+                  <span className="text-[18px] text-primary font-bold">채널 생성</span>
+                </DialogTitle>
+                <DialogContent>
+                  <TextField
+                    label="워크스페이스 이름"
+                    type="email"
+                    value={channelName}
+                    onChange={onChangeChannelName}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button text="생성하기" onClick={handleCreateChannel} />
+                </DialogActions>
+              </Dialog>
             </div>
             <div className="flex-1 overflow-auto pb-[16px] px-[20px]">
               <details className="group" open>

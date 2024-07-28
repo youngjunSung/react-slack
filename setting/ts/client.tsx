@@ -5,6 +5,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import axios from 'axios';
 import './src/styles/index.scss';
+import { ThemeProvider } from '@mui/material';
+import { customTheme } from './src/styles/customTheme';
 
 import App from './src/layouts/App';
 
@@ -17,6 +19,8 @@ const root = ReactDOM.createRoot(container);
 
 root.render(
   <BrowserRouter>
-    <App />
+    <ThemeProvider theme={customTheme}>
+      <App />
+    </ThemeProvider>
   </BrowserRouter>,
 );
