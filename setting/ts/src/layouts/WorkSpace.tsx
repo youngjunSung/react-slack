@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, ReactNode } from 'react';
-import { useLocation, Navigate, Link } from 'react-router-dom';
+import { useLocation, Navigate, Link, NavLink, useParams } from 'react-router-dom';
 import axios from 'axios';
 import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
@@ -9,11 +9,30 @@ import gravatar from 'gravatar';
 import { Menu, MenuItem, Popover, Divider, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { TextField, Button } from '@components';
 import { useInput } from '@hooks/useInput';
-import { IUser } from '@typings/db';
+import { IUser, IWorkspace } from '@typings/db';
 import { KeyboardArrowDown } from '@mui/icons-material';
 
 const WorkSpace = () => {
-  const { data: myLoginData, error, mutate } = useSWR<IUser | false>('http://localhost:3095/api/users', fetcher);
+  const params = useParams();
+  const { data: myLoginData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher);
+  const { data: myWorkspaces, error: error2, mutate: mutate2 } = useSWR<IWorkspace[]>('/api/workspaces', fetcher);
+  const {
+    data: myChannels,
+    error: error3,
+    mutate: mutate3,
+  } = useSWR<IWorkspace[]>(`/api/workspaces/${params.workspace}/channels`, fetcher);
+  const {
+    data: workspaceMembers,
+    error: error4,
+    mutate: mutate4,
+  } = useSWR<IUser[] | undefined>(`/api/workspaces/${params.workspace}/members`, fetcher);
+  const {
+    data: channelMembers,
+    error: error5,
+    mutate: mutate6,
+  } = useSWR<IUser[] | undefined>(params.channel ? `/api/workspaces/${params.workspace}/channels/${params.channel}/members` : null, fetcher);
+  const [newWorkspaceMember, setNewWorkspaceMember, onChangeNewWorkspaceMember] = useInput('');
+  const [newChannelMember, setNewChannelMember, onChangeNewChannelMember] = useInput('');
   const [channelName, setChannelName, onChangeChannelName] = useInput('');
   const [wsName, setWsName, onChangeWsName] = useInput('');
   const [wsUrl, setWsUrl, onChangeWsUrl] = useInput('');
@@ -50,6 +69,16 @@ const WorkSpace = () => {
     setOpenDialogNewWorkspace(false);
   };
 
+  const [openDialogInviteMember, setOpenDialogInviteMember] = useState(false);
+
+  const handleDialogInviteMemberOpen = () => {
+    setOpenDialogInviteMember(true);
+  };
+
+  const handleDialogInviteMemberClose = () => {
+    setOpenDialogInviteMember(false);
+  };
+
   const [openDialogNewChannel, setOpenDialogNewChannel] = useState(false);
 
   const handleDialogNewChannelOpen = () => {
@@ -65,37 +94,57 @@ const WorkSpace = () => {
     if (!wsUrl || !wsUrl.trim()) return;
     axios
       .post(
-        'http://localhost:3095/api/workspaces',
+        '/api/workspaces',
         { workspace: wsName, url: wsUrl },
         {
           withCredentials: true,
         },
       )
       .then(() => {
-        mutate();
+        mutate2();
         handleDialogNewWorkspaceClose();
         setWsName('');
         setWsUrl('');
-        handleDialogNewChannelClose();
-        setChannelName('');
       })
       .catch((error) => {
         console.log(error);
       });
   }, [wsName, wsUrl]);
 
+  const handleInviteMemberWorkspace = useCallback(() => {
+    if (!newWorkspaceMember || !newWorkspaceMember.trim()) return;
+    axios
+      .post(
+        `/api/workspaces/${params.workspace}/members`,
+        { email: newWorkspaceMember },
+        {
+          withCredentials: true,
+        },
+      )
+      .then(() => {
+        mutate4();
+        handleMenuWorkspaceClose();
+        handleDialogInviteMemberClose();
+        setNewWorkspaceMember('');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [newWorkspaceMember]);
+
   const handleCreateChannel = useCallback(() => {
     if (!channelName || !channelName.trim()) return;
     axios
       .post(
-        'http://localhost:3095/api/workspaces',
+        `/api/workspaces/${params.workspace}/channels`,
         { name: channelName },
         {
           withCredentials: true,
         },
       )
       .then(() => {
-        mutate();
+        mutate3();
+        handleMenuWorkspaceClose();
         handleDialogNewChannelClose();
         setChannelName('');
       })
@@ -106,13 +155,19 @@ const WorkSpace = () => {
 
   const handleLogout = useCallback((e: React.MouseEvent<HTMLElement>) => {
     axios
-      .post('http://localhost:3095/api/users/logout', null, {
+      .post('/api/users/logout', null, {
         withCredentials: true,
       })
       .then(() => {
         mutate();
       });
   }, []);
+
+  // console.log(myLoginData);
+  // console.log(myWorkspaces);
+  // console.log(workspaceMembers);
+  // console.log(myChannels);
+  // console.log(channelMembers);
 
   if (!myLoginData) return <Navigate to="/" />;
 
@@ -125,7 +180,7 @@ const WorkSpace = () => {
             return (
               <Link
                 key={ws.id}
-                to={`${123}/channel/일반`}
+                to={`${ws.name}/channel/일반`}
                 type="button"
                 className="flex justify-center items-center rounded-[6px] bg-[#ababad] text-black text-[20px] font-bold w-[36px] h-[36px] [&:not(:last-child)]:mb-[20px]"
               >
@@ -231,38 +286,67 @@ const WorkSpace = () => {
                 }}
               >
                 <MenuItem>Sleact</MenuItem>
-                <MenuItem>~ 으로 사용자 초대</MenuItem>
+                <MenuItem onClick={handleDialogInviteMemberOpen}>워크스페이스에 사용자 초대하기</MenuItem>
+                <Dialog
+                  open={openDialogInviteMember}
+                  onClose={handleDialogInviteMemberClose}
+                  aria-labelledby="alert-dialog-title"
+                  aria-describedby="alert-dialog-description"
+                  sx={{
+                    '& .MuiPaper-root': {
+                      width: 350,
+                    },
+                    '& .MuiDialogActions-root': {
+                      padding: '16px 24px',
+                    },
+                  }}
+                >
+                  <DialogTitle id="alert-dialog-title">
+                    <span className="text-[18px] text-primary font-bold">사용자 초대</span>
+                  </DialogTitle>
+                  <DialogContent>
+                    <TextField
+                      label="이메일"
+                      type="email"
+                      value={newWorkspaceMember}
+                      onChange={onChangeNewWorkspaceMember}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button text="초대하기" onClick={handleInviteMemberWorkspace} />
+                  </DialogActions>
+                </Dialog>
                 <MenuItem onClick={handleDialogNewChannelOpen}>채널 만들기</MenuItem>
+                <Dialog
+                  open={openDialogNewChannel}
+                  onClose={handleDialogNewChannelClose}
+                  aria-labelledby="alert-dialog-title"
+                  aria-describedby="alert-dialog-description"
+                  sx={{
+                    '& .MuiPaper-root': {
+                      width: 350,
+                    },
+                    '& .MuiDialogActions-root': {
+                      padding: '16px 24px',
+                    },
+                  }}
+                >
+                  <DialogTitle id="alert-dialog-title">
+                    <span className="text-[18px] text-primary font-bold">채널 생성</span>
+                  </DialogTitle>
+                  <DialogContent>
+                    <TextField
+                      label="워크스페이스 이름"
+                      type="text"
+                      value={channelName}
+                      onChange={onChangeChannelName}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button text="생성하기" onClick={handleCreateChannel} />
+                  </DialogActions>
+                </Dialog>
               </Menu>
-              <Dialog
-                open={openDialogNewChannel}
-                onClose={handleDialogNewChannelClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-                sx={{
-                  '& .MuiPaper-root': {
-                    width: 350,
-                  },
-                  '& .MuiDialogActions-root': {
-                    padding: '16px 24px',
-                  },
-                }}
-              >
-                <DialogTitle id="alert-dialog-title">
-                  <span className="text-[18px] text-primary font-bold">채널 생성</span>
-                </DialogTitle>
-                <DialogContent>
-                  <TextField
-                    label="워크스페이스 이름"
-                    type="email"
-                    value={channelName}
-                    onChange={onChangeChannelName}
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <Button text="생성하기" onClick={handleCreateChannel} />
-                </DialogActions>
-              </Dialog>
             </div>
             <div className="flex-1 overflow-auto pb-[16px] px-[20px]">
               <details className="group" open>
@@ -276,12 +360,21 @@ const WorkSpace = () => {
                   Channels
                 </summary>
                 <div className="flex flex-col">
-                  <Link to="channel" className="py-[4px] text-[14px] text-white font-normal text-left">
-                    Ch1
-                  </Link>
-                  <Link to="channel" className="py-[4px] text-[14px] text-white font-normal text-left">
-                    Ch2
-                  </Link>
+                  {myChannels?.map((e, idx) => {
+                    return (
+                      <NavLink
+                        key={e.id}
+                        to={`channel/${e.name}`}
+                        className={({ isActive }: { isActive: boolean }): string | undefined =>
+                          isActive
+                            ? 'py-[4px] text-[14px] text-white text-left font-bold underline'
+                            : 'py-[4px] text-[14px] text-white text-left font-normal'
+                        }
+                      >
+                        # {e.name}
+                      </NavLink>
+                    );
+                  })}
                 </div>
               </details>
               <details className="group" open>
@@ -295,10 +388,14 @@ const WorkSpace = () => {
                   Direct Messages
                 </summary>
                 <div className="flex flex-col">
-                  {[...Array(100)].map((_, idx) => {
+                  {workspaceMembers?.map((member, idx) => {
                     return (
-                      <Link key={idx} to="dm" className="py-[4px] text-[14px] text-white font-normal text-left">
-                        id{idx}
+                      <Link
+                        key={member.id}
+                        to={`dm/${member.id}`}
+                        className="py-[4px] text-[14px] text-white font-normal text-left"
+                      >
+                        {member.nickname}
                       </Link>
                     );
                   })}

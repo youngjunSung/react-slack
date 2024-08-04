@@ -1,20 +1,33 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import WorkSpace from '../layouts/WorkSpace';
+import { useParams } from 'react-router-dom';
+import useSWR from 'swr';
+import { IUser } from '@typings/db';
+import fetcher from '@utils/fetcher';
+import gravatar from 'gravatar';
+import { useInput } from '@hooks/useInput';
+import autosize from 'autosize';
+import { ChatBox } from '@components';
 
 const DirectMessage = () => {
+  const { workspace, id } = useParams();
+  const { data: userData, error, mutate } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher);
+  const [chat, setChat, onChangeChat] = useInput('');
+  const onSubmit = () => {
+
+  }
+  console.log(chat);
+  
   return (
     <>
       <div className="py-[16px] px-[20px]">
-        <h3 className="text-[18px] font-bold text-black">DirectMessage Header</h3>
+        <h3 className="flex items-center text-[18px] font-bold text-black">
+          <img src={gravatar.url(userData?.email, { s: '24px', d: 'retro' })} alt="" />
+          <span className="ml-[10px]">{userData?.email}</span>
+        </h3>
       </div>
       <div className="flex-1 py-[16px] px-[20px]"></div>
-      <div className="px-[20px] pb-[20px]">
-        <textarea
-          name=""
-          id=""
-          className="resize-none p-[10px] border-[1px] border-gray-300 border-solid w-full rounded-[8px]"
-        ></textarea>
-      </div>
+      <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmit={onSubmit} />
     </>
   );
 };

@@ -10,7 +10,7 @@ import fetcher from '@utils/fetcher';
 const Login = () => {
   // useSWR은 get으로 요청한 데이터를 받아와서 저장한다.
   // mutate : 내가 원할 때 SWR 호출하기
-  const { data, error, mutate } = useSWR('http://localhost:3095/api/users', fetcher, {
+  const { data, error, mutate } = useSWR('/api/users', fetcher, {
     dedupingInterval: 5000, // 주기적으로 호출하지만, dedupingInterval 기간 내에는 캐시에서 불러온다
   });
   const [logInError, setLogInError] = useState(false);
@@ -29,7 +29,7 @@ const Login = () => {
       setLogInError(false);
       axios
         .post(
-          'http://localhost:3095/api/users/login',
+          '/api/users/login',
           { email, password },
           {
             withCredentials: true,
@@ -45,9 +45,7 @@ const Login = () => {
     [email, password],
   );
 
-  console.log(data);
-
-  if (data) return <Navigate to="/workspace/channel" />;
+  if (data) return <Navigate to="/workspace/sleact/channel/일반" />;
 
   return (
     <div className="max-w-[400px] mx-auto px-[20px]">

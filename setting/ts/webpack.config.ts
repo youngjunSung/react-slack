@@ -84,12 +84,12 @@ const config: Configuration = {
     static: { directory: path.resolve(__dirname) },
     // CORS 에러 시 프론트에서 해결할 때 사용
     // 프론트에서 /api/ 주소로 보내는 요청은 3095가 보낸 것처럼 하겠다
-    // proxy: {
-    //   '/api/': {
-    //     target: 'http://localhost:3095',
-    //     changeOrigin: true,
-    //   },
-    // },
+    proxy: {
+      '/api/': {
+        target: 'http://localhost:3095',
+        changeOrigin: true,
+      },
+    },
   },
 };
 

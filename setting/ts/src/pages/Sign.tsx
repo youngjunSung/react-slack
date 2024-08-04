@@ -8,7 +8,7 @@ import useSWR from 'swr';
 import fetcher from '@utils/fetcher';
 
 const Sign = () => {
-  const { data, error, mutate } = useSWR('http://localhost:3095/api/users', fetcher);
+  const { data, error, mutate } = useSWR('/api/users', fetcher);
   const [email, setEmail, onChangeEmail] = useInput('');
   const [nickname, setNickname, onChangeNickname] = useInput<string>('');
   const [password, setPassword] = useInput<string>('');
@@ -41,7 +41,7 @@ const Sign = () => {
         setSignUpSuccess(false);
         // localhost 3090(프론트)가 3095(백엔드)로 보내는 요청
         axios
-          .post('http://localhost:3095/api/users', {
+          .post('/api/users', {
             email,
             nickname,
             password,
@@ -59,12 +59,13 @@ const Sign = () => {
     [email, nickname, password, passwordCheck, missmatchError],
   );
 
-  if (data) return <Navigate to="/workspace/channel" />;
+  if (data) return <Navigate to="/workspace/sleact/channel/일반" />;
 
   return (
     <div className="max-w-[400px] mx-auto px-[20px]">
-      <h1 className="flex justify-center pt-[60px] pb-[20px]">
-        <LogoChat />
+      <h1 className="flex flex-col items-center justify-center pt-[60px] pb-[20px]">
+        <LogoChat color="#444791" />
+        <span className="mt-[10px] text-primary text-[20px] font-bold">ReChat</span>
         <span className="blind">Slack</span>
       </h1>
       <TextField label="이메일 주소" type="email" value={email} onChange={onChangeEmail} />
