@@ -4,9 +4,11 @@ type ReturnTypes<T> = [T, Dispatch<SetStateAction<T>>, (e: React.ChangeEvent<HTM
 
 export const useInput = <T>(initialData: T): ReturnTypes<T> => {
   const [state, setState] = useState(initialData);
-  const handler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setState(e.target.value as unknown as T);
-  }, [state])
-  return [state, setState, handler]
-}
-
+  const handler = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setState(e.target.value as unknown as T);
+    },
+    [state],
+  );
+  return [state, setState, handler];
+};
