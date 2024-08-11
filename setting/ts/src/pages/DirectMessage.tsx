@@ -9,10 +9,17 @@ import { useInput } from '@hooks/useInput';
 import autosize from 'autosize';
 import { ChatBox } from '@components';
 import axios from 'axios';
+import useSocket from '@hooks/useSocket';
 
 const DirectMessage = () => {
   const { workspace, id } = useParams();
+  const [socket] = useSocket(workspace);
   const { data: userData, error, mutate } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher);
+  // const {
+  //   data: chatList,
+  //   error: error2,
+  //   mutate: mutate2,
+  // } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher);
   const {
     data: chatData,
     error: error2,
@@ -31,11 +38,21 @@ const DirectMessage = () => {
       )
       .then(() => {
         setChat('');
+        mutate2();
       })
       .catch((error) => {
         console.log(error);
       });
   };
+  useEffect(() => {
+    socket?.on('dm', (data: number[]) => {
+      mutate2();
+    });
+    return () => {
+      socket?.off('dm');
+    };
+  }, []);
+  console.log(chatData);
   return (
     <>
       <div className="py-[16px] px-[20px]">
@@ -44,7 +61,11 @@ const DirectMessage = () => {
           <span className="ml-[10px]">{userData?.email}</span>
         </h3>
       </div>
-      <div className="flex-1 py-[16px] px-[20px]"></div>
+      <div className="flex-1 py-[16px] px-[20px]">
+        {chatData?.map((e: any, idx: number) => {
+          return <p key={idx}>{e.content}</p>;
+        })}
+      </div>
       <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmit={onSubmit} />
     </>
   );

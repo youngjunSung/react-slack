@@ -12,7 +12,7 @@ export const ChatBox = ({ chat, onSubmit, onChangeChat, placeholder }: ChatBoxPr
   const RefTextarea = useRef<HTMLTextAreaElement>(null);
   const onKeyDownChat = (e: React.KeyboardEvent) => {
     // console.log(e)
-    if (e.key === 'Enter' && e.shiftKey === true) {
+    if (e.key === 'Enter' && e.shiftKey === false) {
       console.log(e);
       onSubmit(e);
     }
@@ -25,7 +25,7 @@ export const ChatBox = ({ chat, onSubmit, onChangeChat, placeholder }: ChatBoxPr
   return (
     <div className="px-[20px] pb-[20px]">
       <textarea
-        rows={1}
+        rows={1} // autosize 플러그인 사용 시 기본 높이 제어 속성
         ref={RefTextarea}
         value={chat}
         onChange={onChangeChat}

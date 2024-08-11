@@ -9,15 +9,17 @@ import gravatar from 'gravatar';
 import { Menu, MenuItem, Popover, Divider, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { TextField, Button } from '@components';
 import { useInput } from '@hooks/useInput';
+import useSocket from '@hooks/useSocket';
 import { IUser, IWorkspace } from '@typings/db';
 import { KeyboardArrowDown } from '@mui/icons-material';
 
 const WorkSpace = () => {
   const params = useParams();
+  const [socket, disconnet] = useSocket(params.workspace);
   const { data: myLoginData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher);
   const { data: myWorkspaces, error: error2, mutate: mutate2 } = useSWR<IWorkspace[]>('/api/workspaces', fetcher);
   const {
-    data: myChannels,
+    data: channelData,
     error: error3,
     mutate: mutate3,
   } = useSWR<IWorkspace[]>(`/api/workspaces/${params.workspace}/channels`, fetcher);
@@ -30,12 +32,16 @@ const WorkSpace = () => {
     data: channelMembers,
     error: error5,
     mutate: mutate6,
-  } = useSWR<IUser[] | undefined>(params.channel ? `/api/workspaces/${params.workspace}/channels/${params.channel}/members` : null, fetcher);
+  } = useSWR<IUser[] | undefined>(
+    params.channel ? `/api/workspaces/${params.workspace}/channels/${params.channel}/members` : null,
+    fetcher,
+  );
   const [newWorkspaceMember, setNewWorkspaceMember, onChangeNewWorkspaceMember] = useInput('');
   const [newChannelMember, setNewChannelMember, onChangeNewChannelMember] = useInput('');
   const [channelName, setChannelName, onChangeChannelName] = useInput('');
   const [wsName, setWsName, onChangeWsName] = useInput('');
   const [wsUrl, setWsUrl, onChangeWsUrl] = useInput('');
+  const [onLineList, setOnLineList] = useState<number[]>([]);
 
   const [anchorElProfile, setAnchorElProfile] = useState<null | HTMLElement>(null);
   const openMenuProfile = Boolean(anchorElProfile);
@@ -163,10 +169,33 @@ const WorkSpace = () => {
       });
   }, []);
 
-  // console.log(myLoginData);
+  useEffect(() => {
+    if (channelData && myLoginData && socket) {
+      socket.emit('login', { id: myLoginData.id, channels: channelData });
+    }
+  }, [channelData, myLoginData, socket]);
+
+  useEffect(() => {
+    return () => {
+      disconnet();
+    };
+  }, [params.workspace, disconnet]);
+
+  useEffect(() => {
+    socket?.on('onlineList', (data: number[]) => {
+      setOnLineList(data);
+    });
+    return () => {
+      socket?.off('onLineList');
+    };
+  }, [socket]);
+
+  console.log(socket);
+  console.log(onLineList);
+  console.log(myLoginData);
   // console.log(myWorkspaces);
   // console.log(workspaceMembers);
-  // console.log(myChannels);
+  // console.log(channelData);
   // console.log(channelMembers);
 
   if (!myLoginData) return <Navigate to="/" />;
@@ -360,7 +389,7 @@ const WorkSpace = () => {
                   Channels
                 </summary>
                 <div className="flex flex-col">
-                  {myChannels?.map((e, idx) => {
+                  {channelData?.map((e, idx) => {
                     return (
                       <NavLink
                         key={e.id}
@@ -393,8 +422,13 @@ const WorkSpace = () => {
                       <Link
                         key={member.id}
                         to={`dm/${member.id}`}
-                        className="py-[4px] text-[14px] text-white font-normal text-left"
+                        className={`flex items-center py-[4px] text-[14px] text-white font-normal text-left`}
                       >
+                        <span
+                          className={`w-[8px] h-[8px] mr-[4px] rounded-full border border-white ${
+                            onLineList.includes(member.id) && `bg-[#69ff37] border-none`
+                          }`}
+                        ></span>
                         {member.nickname}
                       </Link>
                     );
