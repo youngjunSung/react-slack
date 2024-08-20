@@ -5,14 +5,18 @@ export const customTheme = createTheme({
     fontFamily: 'pretendard',
     fontSize: 12,
   },
-//   components: {
-//     MuiAppBar: {
-//       styleOverrides: {
-//         // 스타일 오버라이드
-//         root: {
-//           fontSize: '2rem',
-//         },
-//       },
-//     },
-//   },
+  components: {
+    MuiDialog: {
+      styleOverrides: {
+        // 스타일 오버라이드
+        paper: {
+          width: 350,
+          borderRadius: '10px',
+          '& .MuiDialogActions-root': {
+            padding: '16px 24px',
+          },
+        },
+      },
+    },
+  },
 });

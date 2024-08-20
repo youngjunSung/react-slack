@@ -11,7 +11,7 @@ import { TextField, Button } from '@components';
 import { useInput } from '@hooks/useInput';
 import useSocket from '@hooks/useSocket';
 import { IUser, IWorkspace } from '@typings/db';
-import { KeyboardArrowDown } from '@mui/icons-material';
+import { KeyboardArrowDown, Logout } from '@mui/icons-material';
 
 const WorkSpace = () => {
   const params = useParams();
@@ -75,14 +75,14 @@ const WorkSpace = () => {
     setOpenDialogNewWorkspace(false);
   };
 
-  const [openDialogInviteMember, setOpenDialogInviteMember] = useState(false);
+  const [openDialogInviteWorkspace, setOpenDialogInviteWorkspace] = useState(false);
 
-  const handleDialogInviteMemberOpen = () => {
-    setOpenDialogInviteMember(true);
+  const handleDialogInviteWorkspaceOpen = () => {
+    setOpenDialogInviteWorkspace(true);
   };
 
-  const handleDialogInviteMemberClose = () => {
-    setOpenDialogInviteMember(false);
+  const handleDialogInviteWorkspaceClose = () => {
+    setOpenDialogInviteWorkspace(false);
   };
 
   const [openDialogNewChannel, setOpenDialogNewChannel] = useState(false);
@@ -107,7 +107,7 @@ const WorkSpace = () => {
         },
       )
       .then(() => {
-        mutate2();
+        mutate();
         handleDialogNewWorkspaceClose();
         setWsName('');
         setWsUrl('');
@@ -117,7 +117,7 @@ const WorkSpace = () => {
       });
   }, [wsName, wsUrl]);
 
-  const handleInviteMemberWorkspace = useCallback(() => {
+  const handleInviteWorkspace = useCallback(() => {
     if (!newWorkspaceMember || !newWorkspaceMember.trim()) return;
     axios
       .post(
@@ -130,7 +130,7 @@ const WorkSpace = () => {
       .then(() => {
         mutate4();
         handleMenuWorkspaceClose();
-        handleDialogInviteMemberClose();
+        handleDialogInviteWorkspaceClose();
         setNewWorkspaceMember('');
       })
       .catch((error) => {
@@ -193,7 +193,7 @@ const WorkSpace = () => {
   console.log(socket);
   console.log(onLineList);
   console.log(myLoginData);
-  // console.log(myWorkspaces);
+  console.log(myWorkspaces);
   // console.log(workspaceMembers);
   // console.log(channelData);
   // console.log(channelMembers);
@@ -202,18 +202,22 @@ const WorkSpace = () => {
 
   return (
     <div className="flex flex-col h-full bg-primary">
-      <header className="flex min-h-[40px] py-[6px] px-[10px]"></header>
+      <header className="flex items-center min-h-[50px] py-[6px] px-[15px]">
+        <button type="button" onClick={handleLogout} className="ml-auto center p-[6px]">
+          <Logout className="text-white" />
+        </button>
+      </header>
       <main className="flex flex-1 min-h-0">
         <div className="flex flex-col shrink-0 items-center py-[14px] px-[6px] w-[70px]">
           {myLoginData.Workspaces.map((ws) => {
             return (
               <Link
                 key={ws.id}
-                to={`${ws.name}/channel/일반`}
+                to={`/workspace/${ws.name}/channel/일반`}
                 type="button"
                 className="flex justify-center items-center rounded-[6px] bg-[#ababad] text-black text-[20px] font-bold w-[36px] h-[36px] [&:not(:last-child)]:mb-[20px]"
               >
-                {ws.name.slice(0, 1)}
+                {ws.name.slice(0, 1).toUpperCase()}
               </Link>
             );
           })}
@@ -229,14 +233,6 @@ const WorkSpace = () => {
             onClose={handleDialogNewWorkspaceClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
-            sx={{
-              '& .MuiPaper-root': {
-                width: 350,
-              },
-              '& .MuiDialogActions-root': {
-                padding: '16px 24px',
-              },
-            }}
           >
             <DialogTitle id="alert-dialog-title">
               <span className="text-[18px] text-primary font-bold">워크스페이스 생성</span>
@@ -315,20 +311,12 @@ const WorkSpace = () => {
                 }}
               >
                 <MenuItem>Sleact</MenuItem>
-                <MenuItem onClick={handleDialogInviteMemberOpen}>워크스페이스에 사용자 초대하기</MenuItem>
+                <MenuItem onClick={handleDialogInviteWorkspaceOpen}>워크스페이스에 사용자 초대하기</MenuItem>
                 <Dialog
-                  open={openDialogInviteMember}
-                  onClose={handleDialogInviteMemberClose}
+                  open={openDialogInviteWorkspace}
+                  onClose={handleDialogInviteWorkspaceClose}
                   aria-labelledby="alert-dialog-title"
                   aria-describedby="alert-dialog-description"
-                  sx={{
-                    '& .MuiPaper-root': {
-                      width: 350,
-                    },
-                    '& .MuiDialogActions-root': {
-                      padding: '16px 24px',
-                    },
-                  }}
                 >
                   <DialogTitle id="alert-dialog-title">
                     <span className="text-[18px] text-primary font-bold">사용자 초대</span>
@@ -342,7 +330,7 @@ const WorkSpace = () => {
                     />
                   </DialogContent>
                   <DialogActions>
-                    <Button text="초대하기" onClick={handleInviteMemberWorkspace} />
+                    <Button text="초대하기" onClick={handleInviteWorkspace} />
                   </DialogActions>
                 </Dialog>
                 <MenuItem onClick={handleDialogNewChannelOpen}>채널 만들기</MenuItem>
@@ -351,14 +339,6 @@ const WorkSpace = () => {
                   onClose={handleDialogNewChannelClose}
                   aria-labelledby="alert-dialog-title"
                   aria-describedby="alert-dialog-description"
-                  sx={{
-                    '& .MuiPaper-root': {
-                      width: 350,
-                    },
-                    '& .MuiDialogActions-root': {
-                      padding: '16px 24px',
-                    },
-                  }}
                 >
                   <DialogTitle id="alert-dialog-title">
                     <span className="text-[18px] text-primary font-bold">채널 생성</span>
@@ -379,7 +359,7 @@ const WorkSpace = () => {
             </div>
             <div className="flex-1 overflow-auto pb-[16px] px-[20px]">
               <details className="group" open>
-                <summary className="flex items-center py-[6px] text-[14px] text-white font-normal pl-[6px]">
+                <summary className="flex items-center cursor-pointer py-[6px] text-[14px] text-white font-normal pl-[6px]">
                   <Icon.TriangleDown
                     width={10}
                     height={10}
@@ -388,7 +368,7 @@ const WorkSpace = () => {
                   />{' '}
                   Channels
                 </summary>
-                <div className="flex flex-col">
+                <div className="flex flex-col ml-[26px]">
                   {channelData?.map((e, idx) => {
                     return (
                       <NavLink
@@ -407,7 +387,7 @@ const WorkSpace = () => {
                 </div>
               </details>
               <details className="group" open>
-                <summary className="flex items-center py-[6px] text-[14px] text-white font-normal pl-[6px]">
+                <summary className="flex items-center cursor-pointer py-[6px] text-[14px] text-white font-normal pl-[6px]">
                   <Icon.TriangleDown
                     width={10}
                     height={10}
@@ -416,7 +396,7 @@ const WorkSpace = () => {
                   />{' '}
                   Direct Messages
                 </summary>
-                <div className="flex flex-col">
+                <div className="flex flex-col ml-[26px]">
                   {workspaceMembers?.map((member, idx) => {
                     return (
                       <Link

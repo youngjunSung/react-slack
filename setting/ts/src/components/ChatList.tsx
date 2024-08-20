@@ -1,12 +1,12 @@
 import React, { useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { IUser, IDM } from '@typings/db';
+import { IUser, IChat, IDM } from '@typings/db';
 import gravatar from 'gravatar';
 import dayjs from 'dayjs';
 import Scrollbars from 'react-custom-scrollbars';
 import regexifyString from 'regexify-string';
 
-export const ChatList = ({ chatData }: { chatData: IDM[] | undefined }) => {
+export const ChatList = ({ chatData }: { chatData: IChat[] | IDM[] | undefined }) => {
   const refScrollbars = useRef(null);
   // const result = regexifyString({
   //   input: chatData?.content,

@@ -53,7 +53,7 @@ const DirectMessage = () => {
   console.log(chatData);
   return (
     <>
-      <div className="py-[16px] px-[20px]">
+      <div className="flex items-center py-[16px] px-[20px] border-b border-b-[#eee]">
         <h3 className="flex items-center text-[18px] font-bold text-black">
           <button type="button" className="mt-[4px] flex items-center justify-center rounded-[4px] overflow-hidden">
             <img src={gravatar.url(userData?.email, { s: '24px', d: 'retro' })} alt="" />
