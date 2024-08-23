@@ -191,9 +191,9 @@ const WorkSpace = () => {
   }, [socket]);
 
   console.log(socket);
-  console.log(onLineList);
-  console.log(myLoginData);
-  console.log(myWorkspaces);
+  // console.log(onLineList);
+  // console.log(myLoginData);
+  // console.log(myWorkspaces);
   // console.log(workspaceMembers);
   // console.log(channelData);
   // console.log(channelMembers);

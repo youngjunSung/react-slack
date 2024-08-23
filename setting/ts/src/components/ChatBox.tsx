@@ -23,9 +23,9 @@ export const ChatBox = ({ chat, onSubmit, onChangeChat, placeholder }: ChatBoxPr
     mutate: mutate4,
   } = useSWR<IUser[] | undefined>(`/api/workspaces/${params.workspace}/members`, fetcher);
   const onKeyDownChat = (e: React.KeyboardEvent) => {
-    console.log(e);
+    // console.log(e);
     if (e.key === 'Enter' && e.shiftKey === false && chat.trim()) {
-      console.log(e);
+      // console.log(e);
       onSubmit(e);
     }
   };

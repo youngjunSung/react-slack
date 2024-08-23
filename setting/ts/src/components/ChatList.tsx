@@ -5,8 +5,9 @@ import gravatar from 'gravatar';
 import dayjs from 'dayjs';
 import Scrollbars from 'react-custom-scrollbars';
 import regexifyString from 'regexify-string';
+import { Chat } from '@components';
 
-export const ChatList = ({ chatData }: { chatData: IChat[] | IDM[] | undefined }) => {
+export const ChatList = ({ chatData }: { chatData: { [key: string]: (IDM | IChat)[] } }) => {
   const refScrollbars = useRef(null);
   // const result = regexifyString({
   //   input: chatData?.content,
@@ -29,19 +30,17 @@ export const ChatList = ({ chatData }: { chatData: IChat[] | IDM[] | undefined }
   return (
     <Scrollbars ref={refScrollbars} onScrollFrame={handleScroll} autoHide>
       <div className="flex flex-col-reverse flex-1 py-[16px] px-[20px]">
-        {chatData?.map((e: any, idx: number) => {
+        {Object.entries(chatData).map(([date, chats]) => {
           return (
-            <div key={idx} className="flex items-start">
-              <button type="button" className="mt-[4px] flex items-center justify-center rounded-[4px] overflow-hidden">
-                <img src={gravatar.url(e.Sender.email, { s: '24px', d: 'retro' })} alt="" />
-              </button>
-              <div className="ml-[6px]">
-                <div className="flex items-center mb-[4px]">
-                  <p className="text-[16px] text-black font-[600] mr-[4px]">{e.Sender.nickname}</p>
-                  <p className="text-[12px] text-gray-500 font-[400]">{dayjs(e.createdAt).format('h:mm A')}</p>
-                </div>
-                <p>{e.content}</p>
+            <div key={date}>
+              <div className="center sticky top-[6px]">
+                <p className="px-[10px] py-[4px] border-[#eee] border-[1px] rounded-full text-[#777] text-[12px]">
+                  {date}
+                </p>
               </div>
+              {chats.map((chat: any, idx: number) => {
+                return <Chat key={chat.id} chat={chat} />;
+              })}
             </div>
           );
         })}

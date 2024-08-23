@@ -7,7 +7,9 @@ import { useInput } from '@hooks/useInput';
 import { ChatBox, ChatList } from '@components';
 import axios from 'axios';
 import useSocket from '@hooks/useSocket';
-import { IUser, IDM } from '@typings/db';
+import dayjs from 'dayjs';
+import { IUser, IChat, IDM } from '@typings/db';
+import makeSection from '@utils/makeSection';
 
 const DirectMessage = () => {
   const { workspace, id } = useParams();
@@ -44,6 +46,7 @@ const DirectMessage = () => {
   };
   useEffect(() => {
     socket?.on('dm', (data: number[]) => {
+      console.log('메세지 수신');
       mutate2();
     });
     return () => {
@@ -51,6 +54,7 @@ const DirectMessage = () => {
     };
   }, []);
   console.log(chatData);
+  const remakedChatData = makeSection(chatData ? chatData : []);
   return (
     <>
       <div className="flex items-center py-[16px] px-[20px] border-b border-b-[#eee]">
@@ -61,7 +65,7 @@ const DirectMessage = () => {
           <span className="ml-[10px]">{userData?.email}</span>
         </h3>
       </div>
-      <ChatList chatData={chatData} />
+      <ChatList chatData={remakedChatData} />
       <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmit={onSubmit} />
     </>
   );
